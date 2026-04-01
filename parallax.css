@@ -1,0 +1,249 @@
+/* ============================================================
+   AROOSADAA — Parallax & Motion Enhancement Layer
+   Drop this <link> tag just before </head> in index.html:
+   <link rel="stylesheet" href="parallax.css">
+   ============================================================ */
+
+/* ── 1. PERFORMANCE HINTS ──────────────────────────────────── */
+/* Applied to every animated element so the browser creates
+   a separate GPU compositing layer and avoids layout reflows. */
+.parallax-hero-bg,
+.parallax-hero-content,
+.parallax-blob,
+.parallax-card,
+.parallax-img,
+.parallax-stats-bg,
+.parallax-contact-bg,
+.scroll-reveal {
+  will-change: transform, opacity;
+}
+
+/* ── 2. HERO SECTION ──────────────────────────────────────── */
+
+/* The hero wrapper needs relative + overflow-hidden so the
+   background can shift without spilling outside the section. */
+#hero,
+.hero,
+[class*="hero"] {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background layer — moves at ~0.4× scroll speed (set in JS) */
+.parallax-hero-bg {
+  position: absolute;
+  inset: -15% 0;          /* extra height on both ends absorbs the shift */
+  background-size: cover;
+  background-position: center;
+  transition: transform 0s linear; /* JS drives this via requestAnimationFrame */
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Foreground content — stays above the bg layer */
+.parallax-hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── 3. FLOATING BLOB SHAPES (hero atmosphere) ────────────── */
+/* Two decorative blurred circles that drift slowly on scroll */
+.parallax-blob {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  opacity: 0.18;
+  filter: blur(60px);
+  transition: transform 0s linear;
+}
+
+.parallax-blob--a {
+  width: clamp(200px, 40vw, 500px);
+  height: clamp(200px, 40vw, 500px);
+  background: radial-gradient(circle, #f0c8d4, #e8a0b0);
+  top: -80px;
+  left: -80px;
+}
+
+.parallax-blob--b {
+  width: clamp(160px, 30vw, 380px);
+  height: clamp(160px, 30vw, 380px);
+  background: radial-gradient(circle, #c8a0d4, #a070b8);
+  bottom: -60px;
+  right: -60px;
+}
+
+/* Mouse-parallax layer (hero only) — 3D depth on hover */
+.hero-mouse-layer {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+}
+
+/* ── 4. SCROLL-REVEAL BASE ────────────────────────────────── */
+/* Elements start invisible and slightly below their final
+   position. The JS Intersection Observer adds .is-visible
+   to trigger the entrance animation. */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition:
+    opacity 0.65s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.65s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger siblings using CSS custom property —
+   JS sets --delay on each card: style="--delay:0.1s" etc. */
+.scroll-reveal {
+  transition-delay: var(--delay, 0s);
+}
+
+/* ── 5. SERVICES SECTION — CARD DEPTH ────────────────────── */
+.parallax-card {
+  transition:
+    transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.4s ease;
+  transform-origin: center bottom;
+  cursor: default;
+}
+
+.parallax-card:hover {
+  transform: translateY(-8px) scale(1.02) !important;
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
+}
+
+/* ── 6. PORTFOLIO GRID — PER-IMAGE PARALLAX ──────────────── */
+/* Images overflow their container slightly so the shift is
+   invisible at the edges — inset handles this. */
+.parallax-img-wrapper {
+  overflow: hidden;
+  position: relative;
+}
+
+.parallax-img {
+  display: block;
+  width: 100%;
+  height: 110%;                /* 10% extra to absorb vertical shift */
+  object-fit: cover;
+  object-position: center;
+  transition: transform 0s linear;
+}
+
+/* Subtle tilt on mouse-hover for portfolio items */
+.parallax-img-wrapper:hover .parallax-img {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* ── 7. STATS SECTION ─────────────────────────────────────── */
+#stats,
+.stats,
+[class*="stats"] {
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax-stats-bg {
+  position: absolute;
+  inset: -20% 0;
+  background-size: cover;
+  background-position: center;
+  z-index: 0;
+  pointer-events: none;
+  transition: transform 0s linear;
+}
+
+.stats-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* Counter animation — number counts up from 0 */
+.stat-number {
+  display: inline-block;
+  transition: transform 0.3s ease;
+}
+
+/* ── 8. CONTACT SECTION ───────────────────────────────────── */
+#contact,
+.contact,
+[class*="contact"] {
+  position: relative;
+  overflow: hidden;
+}
+
+.parallax-contact-bg {
+  position: absolute;
+  inset: -15% 0;
+  background: inherit;
+  z-index: 0;
+  pointer-events: none;
+  transition: transform 0s linear;
+  /* Floating gradient shapes for depth */
+  background-image:
+    radial-gradient(circle at 20% 50%, rgba(240, 200, 212, 0.25) 0%, transparent 50%),
+    radial-gradient(circle at 80% 30%, rgba(200, 160, 212, 0.2) 0%, transparent 45%);
+}
+
+.contact-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ── 9. SCROLL-BASED OPACITY (section intros) ────────────── */
+/* Sections fade in as they enter the viewport — driven by
+   IntersectionObserver in JS; no extra class needed. */
+.section-fade {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.section-fade.is-visible {
+  opacity: 1;
+}
+
+/* ── 10. MOBILE — reduce motion ──────────────────────────── */
+/* Disable parallax on small screens (perf + usability).
+   Scroll-reveal animations are kept but simplified. */
+@media (max-width: 768px) {
+  .parallax-hero-bg,
+  .parallax-stats-bg,
+  .parallax-contact-bg,
+  .parallax-blob,
+  .hero-mouse-layer {
+    transform: none !important;
+  }
+
+  .parallax-img {
+    height: 100%;
+    transform: none !important;
+  }
+
+  .scroll-reveal {
+    transform: translateY(16px);
+    transition-duration: 0.45s;
+  }
+}
+
+/* Respect prefers-reduced-motion system setting */
+@media (prefers-reduced-motion: reduce) {
+  .scroll-reveal,
+  .parallax-card,
+  .parallax-img,
+  .parallax-hero-bg,
+  .parallax-stats-bg,
+  .parallax-contact-bg,
+  .parallax-blob {
+    transition: none !important;
+    transform: none !important;
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}
